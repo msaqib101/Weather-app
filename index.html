@@ -8,29 +8,42 @@
 </head>
 <body>
   <h1>Weather App</h1>
-  <form onsubmit="abc(e)">
+  <form onsubmit="abc(event)">
     <label for="city">Enter City Name:</label>
-    <input type="text" id="city" name="city" />
+    <input type="text" id="city" name="city" required />
     <button type="submit">Get Weather</button>
   </form>
 
+  <div id="res" style="margin-top: 20px;"></div>
+
   <script>
     function abc(e) {
-      e.preventDefault(); // Prevent form from refreshing the page
-      let cityname = document.getElementById("city").value;
+      e.preventDefault(); 
+      const cityname = document.getElementById("city").value.trim();
+      const resultDiv = document.getElementById("res");
+
+      
 
       axios.get(`https://api.weatherapi.com/v1/current.json?key=f4ea40c47d8e4c3da4e75310250904&q=${cityname}&aqi=yes`)
         .then(function (response) {
-          // handle success
-          console.log(response.data);
-          alert("Temperature in " + cityname + ": " + response.data.current.temp_c + "°C");
+          const weather = response.data.current;
+          const location = response.data.location;
+
+          resultDiv.innerHTML = `
+            <h2>Weather in ${location.name}, ${location.country}</h2>
+            <p><strong>Temperature:</strong> ${weather.temp_c}°C</p>
+            <p><strong>Condition:</strong> ${weather.condition.text}</p>
+            <img src="https:${weather.condition.icon}" alt="Weather Icon" />
+            <p><strong>Humidity:</strong> ${weather.humidity}%</p>
+            <p><strong>Wind Speed:</strong> ${weather.wind_kph} kph</p>
+            <p><strong>Feels Like:</strong> ${weather.feelslike_c}°C</p>
+          `;
         })
         .catch(function (error) {
-          // handle error
-          console.log(error);
-          alert("Failed to fetch weather. Please check the city name.");
+          console.error(error);
+          resultDiv.innerHTML = `<p style="color: red;">Failed to fetch weather. Please check the city name and try again.</p>`;
         });
     }
-  </script>
+  </script
 </body>
 </html>
